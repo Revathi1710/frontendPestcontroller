@@ -51,7 +51,7 @@ function Header() {
     <header className="bg-white shadow-sm px-4 py-4 d-flex justify-content-between align-items-center">
       {/* Left: Logo */}
       <div className="d-flex align-items-center gap-4">
-        <Link to="/"><h1 className="logonameheader">Post Controller Near me</h1></Link>
+       <h1 className="logonameheader"> <Link to="/">Post Controller Near me</Link></h1>
 
         {/* Property Types 
         <nav className="d-none d-md-flex gap-3">
@@ -107,4 +107,4 @@ function Header() {
   );
 }
 
-expo
+export default Header;

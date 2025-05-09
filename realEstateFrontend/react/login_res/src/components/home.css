@@ -308,7 +308,7 @@ label {
 .bannerbox {
     position: relative;
     width: 100%;
-    height: auto;
+   
     overflow: hidden;
   }
   
@@ -427,5 +427,31 @@ label {
 }
 .footerlist {
      width: 100%; 
+}
+.containerbox{
+    margin-right: 0px !important;
+    padding-left: 0px !important;
+    margin-left: 0px !important;
+    padding-right: 0px !important;
+}
+.homeformtitle{
+    font-size: 15px;
+}
+.formhome-input{
+    width: 50% !important;
+}
+.homeform-overlay {
+    top: 60% !important;
+    margin-bottom: 20px;
+    /* margin-top: 50px; */
+}
+.bannerbox {
+  position: relative;
+  height: 80vh;
+  background-size: cover;
+  background-position: center;
+}
+.ownerpagelist{
+    display: block !important;
 }
 }

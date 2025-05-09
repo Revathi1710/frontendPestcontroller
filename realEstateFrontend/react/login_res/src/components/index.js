@@ -34,8 +34,8 @@ class Index extends Component {
           <div className="homebody">
             <div className="bannerbox position-relative">
               <ImageSlider />
-              <div className="homeform-overlay position-absolute top-50 start-50 translate-middle w-100 px-3">
-                <div className="container">
+              <div className="homeform-overlay position-absolute  translate-middle w-100 px-3">
+                <div className="container containerbox">
                   <HomeForm />
                 </div>
               </div>

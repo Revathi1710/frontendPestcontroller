@@ -1,14 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const HomeForm = () => {
   const [formData, setFormData] = useState({
-    name: "", email: "", state: "", pincode: "", number: "", businessType: "Residential"
+    name: "",
+    email: "",
+    state: "",
+    pincode: "",
+    number: "",
+    businessType: "Residential", // Default value
   });
 
   const [errors, setErrors] = useState({});
   const [existingUser, setExistingUser] = useState(false);
+  const [vendors, setVendors] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Reset vendors when businessType changes to Residential
+    if (formData.businessType === "Residential") {
+      setVendors([]);
+    }
+  }, [formData.businessType]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -41,7 +54,7 @@ const HomeForm = () => {
             state: result.user.state || "",
             pincode: result.user.pincode || "",
             number: result.user.number || "",
-            businessType: result.user.businessType || "Residential"
+            businessType: result.user.businessType || "Residential",
           });
           setExistingUser(true);
         }
@@ -58,21 +71,22 @@ const HomeForm = () => {
       setErrors(validationErrors);
       return;
     }
-  
+
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/VSearchBuyer`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...formData, skipUserSave: existingUser }),
       });
-  
+
       const result = await response.json();
       if (response.ok) {
         // Store UserId in localStorage if response is successful
         if (result.userId) {
           localStorage.setItem('UserId', result.userId);  // Store the UserId
         }
-  
+
+        setVendors(result.vendors || []);
         navigate("/vendors", { state: { vendors: result.vendors || [] } });
       } else {
         alert(result.message || "Submission failed.");
@@ -82,33 +96,32 @@ const HomeForm = () => {
       alert("An error occurred. Please try again.");
     }
   };
-  
 
   return (
-    <div className="container my-5">
+    <div className="container containerbox my-5">
       <div className="card shadow-lg border-0 rounded-4 px-4 py-5">
-        <h3 className="text-center mb-4 text-primary fw-bold">Get Matched With Pest Control Vendors</h3>
+        <h3 className="text-center mb-4 text-primary fw-bold homeformtitle">Get Matched With Pest Control Vendors</h3>
         <form onSubmit={handleSubmit}>
           <div className="row g-3">
-            <div className="col-md-6">
+            <div className="col-md-6 formhome-input">
               <label className="form-label">👤 Name</label>
               <input type="text" name="name" className={`form-control ${errors.name && "is-invalid"}`} value={formData.name} onChange={handleChange} />
               {errors.name && <div className="invalid-feedback">{errors.name}</div>}
             </div>
 
-            <div className="col-md-6">
+            <div className="col-md-6 formhome-input">
               <label className="form-label">📧 Email</label>
               <input type="email" name="email" className={`form-control ${errors.email && "is-invalid"}`} value={formData.email} onChange={handleChange} onBlur={handleEmailBlur} />
               {errors.email && <div className="invalid-feedback">{errors.email}</div>}
             </div>
 
-            <div className="col-md-6">
+            <div className="col-md-6 formhome-input">
               <label className="form-label">🌐 State</label>
               <input type="text" name="state" className={`form-control ${errors.state && "is-invalid"}`} value={formData.state} onChange={handleChange} />
               {errors.state && <div className="invalid-feedback">{errors.state}</div>}
             </div>
 
-            <div className="col-md-6">
+            <div className="col-md-6 formhome-input">
               <label className="form-label">📮 Pincode</label>
               <input type="text" name="pincode" className={`form-control ${errors.pincode && "is-invalid"}`} value={formData.pincode} onChange={handleChange} />
               {errors.pincode && <div className="invalid-feedback">{errors.pincode}</div>}
@@ -119,7 +132,6 @@ const HomeForm = () => {
               <input type="text" name="number" className={`form-control ${errors.number && "is-invalid"}`} value={formData.number} onChange={handleChange} />
               {errors.number && <div className="invalid-feedback">{errors.number}</div>}
             </div>
-            
 
             <div className="col-md-6">
               <label className="form-label">🏢 Business Type</label>
@@ -140,6 +152,17 @@ const HomeForm = () => {
             <button type="submit" className="btn btn-primary w-100 py-2 fs-5 rounded-pill">🔍 Find Vendors</button>
           </div>
         </form>
+
+        {vendors.length > 0 && (
+          <div className="mt-4">
+            <h5>Vendors Available:</h5>
+            <ul>
+              {vendors.map((vendor, index) => (
+                <li key={index}>{vendor.name}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );

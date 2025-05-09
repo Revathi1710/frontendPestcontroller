@@ -2,106 +2,75 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './header.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import logo from '../icons/logbuildero.png';
 
 function Header() {
   const [userName, setUserName] = useState('');
+  const [isVendor, setIsVendor] = useState(false); // to control UI conditionally
+  const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserName = async () => {
       try {
-        const userId = localStorage.getItem('userId');
+        const userId = localStorage.getItem('UserId');
         const vendorId = localStorage.getItem('vendorId');
-
         if (!userId && !vendorId) return;
-
+    
+        setIsVendor(!!vendorId); // true if vendorId exists
+    
         const response = await fetch(`${process.env.REACT_APP_API_URL}/getName`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId, vendorId }),
         });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
+    
         const result = await response.json();
-
-        if (result.status === 'ok' && result.data && result.data.contactPerson) {
-          setUserName(result.data.contactPerson);
-        } else {
-          console.error('Error in API response:', result.message || 'No name found');
+        
+        if (result.status === 'ok') {
+          const name = result.data?.contactPerson || result.data?.name;
+          if (name) setUserName(name);
         }
       } catch (error) {
         console.error('Error fetching name:', error);
       }
     };
+    
 
     fetchUserName();
   }, []);
 
-  const getFirstLetter = (name) => {
-    return name ? name.charAt(0).toUpperCase() : '';
-  };
-
   return (
-    <header className="bg-white shadow-sm px-4 py-4 d-flex justify-content-between align-items-center">
-      {/* Left: Logo */}
-      <div className="d-flex align-items-center gap-4">
-       <h1 className="logonameheader"> <Link to="/">Post Controller Near me</Link></h1>
-
-        {/* Property Types 
-        <nav className="d-none d-md-flex gap-3">
-          <a href="#" className="text-dark fw-medium text-decoration-none">Buy</a>
-          <a href="#" className="text-dark fw-medium text-decoration-none">Rent</a>
-          <a href="#" className="text-dark fw-medium text-decoration-none">Commercial</a>
-        </nav>*/}
+    <header className="bg-white shadow-sm px-3 py-3 d-flex justify-content-between align-items-center flex-wrap">
+      {/* Logo */}
+      <div className="d-flex align-items-center">
+        <h1 className="logonameheader mb-0">
+          <Link to="/">Post Controller Near Me</Link>
+        </h1>
       </div>
 
-      {/* Center: Search + City 
-      <div className="d-none d-lg-flex align-items-center bg-light rounded-pill px-3 py-1" style={{ width: '40%',border:'1px SOLID #bad2ff' }}>
-        <span className="text-muted me-2">📍</span>
-        <select className="form-select border-0 bg-light me-2" style={{ width: '100px'}}>
-          <option>City</option>
-          <option>Delhi</option>
-          <option>Mumbai</option>
-        </select>
-        <input
-          type="text"
-          className="form-control border-0 bg-light"
-          placeholder="Search locality, project, builder..."
-        />
-      </div>*/}
-
-      <div className="d-flex align-items-center gap-3">
-       {/*   {userName ? (
-          <Link to="/dashboard" className="user-circle" title={userName}>
-            {getFirstLetter(userName)}
-          </Link>
+      {/* User Actions */}
+      <div className="d-flex align-items-center gap-3 mt-2 mt-md-0">
+        {userName ? (
+          <div
+            className="position-relative"
+            onMouseEnter={() => setShowDropdown(true)}
+            onMouseLeave={() => setShowDropdown(false)}
+          >
+            <button className="btn postbtn">{userName}</button>
+            {showDropdown && (
+              <div className="dropdown-menu-custom">
+                {isVendor && (
+                  <Link to="/Vendorview" className="dropdown-item-custom">Edit Profile</Link>
+                )}
+                <Link to="/logout" className="dropdown-item-custom">Logout</Link>
+              </div>
+            )}
+          </div>
         ) : (
-          <Link to="/Vendor/Signup" className="login-icon" title="Login / Signup">
-           <i class='far fa-user-circle fs-4'></i>
+          <Link to="/Signup" className="login-icon">
+            <button className="btn postbtn">Login</button>
           </Link>
-        )}*/}
- {userName ? (
-  <>
-  <Link to="/Vendorview" className="login-icon">
-    <button className="btn postbtn">{userName}</button>
-  </Link>
-    <Link to="/logout" className="login-icon">
-    <i class="fa fa-sign-out"></i>
-  </Link>
-  </>
-) : (
-  <Link to="/Signup" className="login-icon">
-    <button className="btn postbtn">Login</button>
-  </Link>
-)}
-
-
+        )}
       </div>
     </header>
   );

@@ -95,7 +95,7 @@ function  PestControlOwner() {
         <hr/>
         <h5 className="mb-3 viewvendor-title">About Us</h5>
         <p> {vendor.aboutUs}</p>
-       <div className="mt-3 container d-flex justify-content-between">
+       <div className="mt-3 container d-flex justify-content-between ownerpagelist">
         <div>
         <h5 className="mb-3 viewvendor-title">Year of Establishment</h5>
         <p> {vendor.sinceFrom}Years</p>
